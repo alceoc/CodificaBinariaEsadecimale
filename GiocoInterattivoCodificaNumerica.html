@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gamification — Esercizi random di codifica binaria ed esadecimale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#10233F; --blue:#1F6FEB; --amber:#F2A93B; --amber-d:#B8720C;
+  --bg:#F5F7FB; --panel:#FFFFFF; --panel2:#EEF2F8; --border:#DCE3EE;
+  --text:#161B26; --gray:#5B6B7F; --green:#2FAE60; --red:#D64550;
+  --head:'Space Grotesk',Arial,sans-serif; --body:'Inter',Calibri,Arial,sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0B1626;--panel:#12213A;--panel2:#182B48;--border:#26395B;--text:#E8EDF7;--gray:#93A4C2;}
+}
+:root[data-theme="dark"]{--bg:#0B1626;--panel:#12213A;--panel2:#182B48;--border:#26395B;--text:#E8EDF7;--gray:#93A4C2;}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased}
+header{background:var(--navy);color:#fff;padding:calc(0.9rem + env(safe-area-inset-top,0px)) 1.1rem 0.9rem}
+.wrap{max-width:820px;margin:0 auto}
+.brand{display:flex;gap:.7rem;align-items:center}
+.badge{width:2.2rem;height:2.2rem;border-radius:.55rem;background:var(--amber);color:var(--navy);font-family:var(--mono);font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+h1{font-family:var(--head);font-size:1.2rem;margin:0}
+header p{margin:.1rem 0 0;font-size:.78rem;color:#AFC3E0}
+main{max-width:820px;margin:0 auto;padding:1.2rem 1.1rem 3rem}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:1rem;padding:1.2rem 1.3rem;margin-bottom:1rem}
+h2{font-family:var(--head);font-size:1.15rem;margin:0 0 .7rem}
+.lbl{font-size:.78rem;font-weight:700;color:var(--gray);margin:.9rem 0 .45rem;letter-spacing:.02em}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem}
+.chip{border:1.5px solid var(--border);background:var(--panel);color:var(--gray);padding:.42rem .8rem;border-radius:999px;font-weight:600;font-size:.82rem;cursor:pointer;font-family:var(--body)}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.seg{display:inline-flex;border:1.5px solid var(--border);border-radius:.6rem;overflow:hidden}
+.seg button{border:none;background:var(--panel);color:var(--gray);padding:.48rem .9rem;font-weight:700;font-size:.82rem;cursor:pointer;font-family:var(--body)}
+.seg button.on{background:var(--blue);color:#fff}
+.row{display:flex;flex-wrap:wrap;gap:1.2rem}
+button.primary{background:var(--blue);color:#fff;border:none;padding:.7rem 1.3rem;border-radius:.6rem;font-weight:700;font-size:.95rem;cursor:pointer;font-family:var(--body)}
+button.primary:hover{filter:brightness(.92)}
+button.amber{background:var(--amber);color:var(--navy);border:none;padding:.7rem 1.3rem;border-radius:.6rem;font-weight:700;font-size:.95rem;cursor:pointer;font-family:var(--body)}
+button.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue);padding:.62rem 1.1rem;border-radius:.6rem;font-weight:700;font-size:.88rem;cursor:pointer;font-family:var(--body)}
+button:disabled{opacity:.5;cursor:default}
+.hud{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem}
+.stat{background:var(--panel2);border-radius:.6rem;padding:.35rem .7rem;font-size:.78rem;font-weight:600;color:var(--gray)}
+.stat b{font-family:var(--mono);color:var(--text);font-size:.95rem}
+.bar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-bottom:1rem}
+.bar div{height:100%;background:var(--amber);width:0;transition:width .3s}
+.tag{display:inline-block;font-size:.72rem;font-weight:700;color:var(--blue);background:rgba(31,111,235,.1);padding:.25rem .6rem;border-radius:999px;margin-bottom:.6rem}
+.q{background:var(--navy);color:#fff;border-radius:.9rem;padding:1.1rem 1.2rem;margin-bottom:1rem}
+.q small{display:block;color:#9FB4D8;font-size:.78rem;font-weight:600;margin-bottom:.4rem}
+.q .big{font-family:var(--mono);font-size:1.5rem;letter-spacing:.05em;word-break:break-word;line-height:1.5}
+.q .ops{font-family:var(--mono);font-size:1.25rem;line-height:1.7}
+.ans{display:flex;gap:.6rem;flex-wrap:wrap}
+input{flex:1;min-width:150px;font-family:var(--mono);font-size:1.15rem;padding:.65rem .8rem;border-radius:.6rem;border:1.5px solid var(--border);background:var(--bg);color:var(--text)}
+input:focus{outline:none;border-color:var(--blue)}
+.fb{margin-top:.9rem;font-weight:700}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.sol{margin-top:.7rem;background:var(--panel2);border:1px dashed var(--border);border-radius:.7rem;padding:.8rem 1rem;font-size:.86rem;line-height:1.55}
+.sol pre{margin:.4rem 0 0;font-family:var(--mono);font-size:.88rem;overflow-x:auto;line-height:1.5}
+.hint{margin-top:.6rem;font-size:.85rem;color:var(--gray);background:rgba(242,169,59,.14);padding:.6rem .8rem;border-radius:.6rem}
+.big-score{font-family:var(--head);font-size:3rem;font-weight:700;color:var(--amber-d);line-height:1}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:.5rem}
+td,th{border-bottom:1px solid var(--border);padding:.45rem .3rem;text-align:left}
+th{color:var(--gray);font-size:.75rem}
+.hidden{display:none}
+.small{font-size:.8rem;color:var(--gray)}
+.homebtn{margin-left:auto;background:var(--amber);color:var(--navy);border:none;padding:.5rem .95rem;border-radius:999px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:var(--body);white-space:nowrap}
+.homebtn:hover{filter:brightness(.93)}
+</style>
+</head>
+<body>
+<header><div class="wrap brand"><div class="badge">01</div><div><h1>Bit Challenge</h1><p>Esercizi casuali su conversioni, esadecimale e somme binarie</p></div><button class="homebtn hidden" id="homeBtn" title="Annulla la sfida e torna alla home">⌂ Home</button></div></header>
+<main>
+
+<section id="setup" class="card">
+  <h2>Prepara la sfida</h2>
+  <div class="lbl">TIPI DI ESERCIZIO (scegline uno o più)</div>
+  <div class="chips" id="cats"></div>
+  <div class="row">
+    <div><div class="lbl">DIFFICOLTÀ</div>
+      <div class="seg" id="diff"><button data-v="1">Facile</button><button data-v="2" class="on">Medio</button><button data-v="3">Difficile</button></div></div>
+    <div><div class="lbl">DOMANDE</div>
+      <div class="seg" id="len"><button data-v="5">5</button><button data-v="10" class="on">10</button><button data-v="20">20</button></div></div>
+    <div><div class="lbl">TEMPO</div>
+      <div class="seg" id="timed"><button data-v="0" class="on">Libero</button><button data-v="1">45s a domanda</button></div></div>
+  </div>
+  <div style="margin-top:1.3rem;display:flex;gap:.7rem;align-items:center;flex-wrap:wrap">
+    <button class="primary" id="startBtn">Inizia la sfida</button>
+    <span class="small" id="bestTxt"></span>
+  </div>
+  <p class="small" style="margin-top:1rem">Le somme in complemento a 2 sono presentate in binario su n bit: rispondi con esattamente n bit. Negli esercizi con overflow scrivi <b>OVF</b> se il risultato non è rappresentabile. Per IEEE-754 (32 bit) puoi scrivere i bit con o senza spazi, oppure le 8 cifre esadecimali.</p>
+</section>
+
+<section id="game" class="hidden">
+  <div class="card">
+    <div class="hud">
+      <div class="stat">Domanda <b id="hQ">1/10</b></div>
+      <div class="stat">Punti <b id="hS">0</b></div>
+      <div class="stat">Serie <b id="hK">0</b></div>
+      <div class="stat hidden" id="hTwrap">Tempo <b id="hT">45</b></div>
+    </div>
+    <div class="bar"><div id="prog"></div></div>
+    <span class="tag" id="tag"></span>
+    <div class="q"><small id="qLabel"></small><div id="qBody"></div></div>
+    <div class="ans">
+      <input id="inp" autocomplete="off" spellcheck="false" autocapitalize="characters">
+      <button class="primary" id="checkBtn">Verifica</button>
+      <button class="ghost" id="hintBtn">Suggerimento (−3)</button>
+    </div>
+    <div id="hint" class="hint hidden"></div>
+    <div class="fb" id="fb"></div>
+    <div class="sol hidden" id="sol"></div>
+    <div style="margin-top:1rem" class="hidden" id="nextWrap"><button class="amber" id="nextBtn">Avanti →</button></div>
+  </div>
+</section>
+
+<section id="end" class="card hidden">
+  <h2>Sfida completata</h2>
+  <div class="big-score" id="eScore">0</div>
+  <p id="eMsg" class="small" style="margin:.4rem 0 1rem"></p>
+  <table id="eTable"></table>
+  <div style="margin-top:1.3rem;display:flex;gap:.7rem;flex-wrap:wrap">
+    <button class="primary" id="againBtn">Rigioca con le stesse impostazioni</button>
+    <button class="ghost" id="menuBtn">Cambia impostazioni</button>
+  </div>
+</section>
+</main>
+
+<script>
+// ---------- utils ----------
+const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[R(0,a.length-1)];
+const pad=(n,w)=>(n>>>0).toString(2).padStart(w,'0');
+const SUP=['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'];
+const sup=n=>String(n).split('').map(c=>c==='-'?'⁻':SUP[+c]).join('');
+const ca2=(v,n)=>v>=0?pad(v,n):pad((1<<n)+v,n);
+const dec2=(bits)=>{const n=bits.length;let v=-parseInt(bits[0])*Math.pow(2,n-1);for(let i=1;i<n;i++)v+=parseInt(bits[i])*Math.pow(2,n-1-i);return v;};
+const inv=b=>b.split('').map(c=>c==='0'?'1':'0').join('');
+const spaced=b=>b.split('').join(' ');
+const clean=s=>s.replace(/\s/g,'');
+const cleanHex=s=>clean(s).replace(/^0x/i,'').replace(/^#/,'').toUpperCase();
+const isBin=s=>/^[01]+$/.test(s);
+const isHex=s=>/^[0-9A-F]+$/.test(s);
+const fmt=n=>String(n).replace('.',',');
+
+function addColumns(a,b){
+  const n=a.length;let c=0;const carry=new Array(n).fill(0);const res=new Array(n);
+  for(let i=n-1;i>=0;i--){carry[i]=c;const s=+a[i]+ +b[i]+c;res[i]=s&1;c=s>>1;}
+  const r=res.join('');
+  return {r,cout:c,text:
+`riporti:   ${carry.map(String).join(' ')}
+A:         ${spaced(a)}
+B:       + ${spaced(b)}
+         ${'-'.repeat(n*2-1)}
+somma:     ${spaced(r)}   (riporto finale ${c} ${c?'→ scartato':''})`};
+}
+function divSteps(v,base){
+  const L=[];let x=v;if(x===0)return '0 : '+base+' = 0 resto 0';
+  while(x>0){const q=Math.floor(x/base),r=x%base;L.push(`${x} : ${base} = ${q}  resto ${r}${base===16&&r>9?' ('+r.toString(16).toUpperCase()+')':''}`);x=q;}
+  return L.join('\n')+'\n(leggi i resti dal basso verso l\'alto)';
+}
+function widths(d){return {conv:[4,8,12][d-1],ca:[4,6,8][d-1],hex:[0xFF,0xFFF,0xFFFF][d-1],hexb:[2,3,4][d-1]};}
+
+// ---------- categories ----------
+const TIPS={
+ bd:'Bin→dec: somma le potenze di 2 dove c\'è un 1. Dec→bin: dividi per 2 e leggi i resti dal basso.',
+ hd:'Hex→dec: moltiplica ogni cifra per una potenza di 16 (A=10 … F=15). Dec→hex: dividi per 16.',
+ hb:'Ogni cifra esadecimale corrisponde esattamente a 4 bit: converti gruppo per gruppo.',
+ ss:'Somma in colonna da destra; il riporto oltre il bit più a sinistra si scarta. Controlla che il segno del risultato sia coerente.',
+ so:'Sommando un positivo e un negativo non c\'è mai overflow. Il riporto finale si scarta.',
+ ov:'C\'è overflow se sommi due numeri dello stesso segno e il risultato ha segno opposto (fuori dal range −2ⁿ⁻¹ … 2ⁿ⁻¹−1).',
+ sb:'A − B = A + (−B): calcola il complemento a 2 di B (inverti e +1) poi somma.',
+ cc:'Per un negativo: scrivi il modulo in binario, inverti tutti i bit (Ca1) e, per il Ca2, aggiungi 1.',
+ sn:'Due negativi: bit di segno 1 in entrambi. Somma in colonna, scarta il riporto finale; il risultato deve iniziare ancora con 1, altrimenti c\'è overflow.',
+ fp:'IEEE-754 (32 bit) = 1 bit segno + 8 bit esponente (bias 127) + 23 bit mantissa. Valore = ±1,mantissa × 2^(E−127). Per il verso inverso: normalizza, esponente memorizzato = e+127, mantissa = cifre dopo la virgola completate a 23 con zeri.',
+ fr:'Parte intera con le potenze di 2; dopo la virgola pesano 2⁻¹, 2⁻², 2⁻³… Dec→bin: moltiplica la parte frazionaria per 2 e leggi le cifre dall\'alto.'
+};
+const CATS=[
+ {id:'bd',name:'Binario ⇄ Decimale',gen:genBD},
+ {id:'hd',name:'Esadecimale ⇄ Decimale',gen:genHD},
+ {id:'hb',name:'Esadecimale ⇄ Binario (diretta)',gen:genHB},
+ {id:'ss',name:'Somma stesso segno',gen:genSS},
+ {id:'sn',name:'Somma tra numeri negativi',gen:genSN},
+ {id:'so',name:'Somma segno opposto',gen:genSO},
+ {id:'ov',name:'Somma con overflow',gen:genOV},
+ {id:'sb',name:'Sottrazione in Ca2',gen:genSB},
+ {id:'cc',name:'Rappresentazione Ca1/Ca2',gen:genCC},
+ {id:'fr',name:'Virgola binaria ⇄ decimale',gen:genFR},
+ {id:'fp',name:'Virgola mobile IEEE-754 ⇄ decimale',gen:genFP}
+];
+
+function genBD(d){
+  const w=widths(d).conv,v=R(1,(1<<w)-1);
+  if(Math.random()<.5){
+    return {label:'Converti in decimale',body:`<div class="big">${pad(v,w)}₂</div>`,ph:'numero decimale',
+      check:s=>parseInt(clean(s),10)===v&&/^\d+$/.test(clean(s)),
+      correct:String(v),
+      sol:()=>{const ones=pad(v,w).split('').map((b,i)=>b==='1'?`2${sup(w-1-i)}=${1<<(w-1-i)}`:null).filter(Boolean);return `Somma le potenze di 2 in corrispondenza degli 1:<pre>${ones.join(' + ')}\n= ${v}</pre>`;}};
+  }
+  return {label:'Converti in binario',body:`<div class="big">${v}₁₀</div>`,ph:'numero binario',
+    check:s=>{const c=clean(s);return isBin(c)&&parseInt(c,2)===v;},
+    correct:v.toString(2),
+    sol:()=>`Divisioni successive per 2:<pre>${divSteps(v,2)}\n\n${v} = ${v.toString(2)}₂</pre>`};
+}
+function genHD(d){
+  const m=widths(d).hex,v=R(16,m);
+  const hx=v.toString(16).toUpperCase();
+  if(Math.random()<.5){
+    return {label:'Converti in decimale',body:`<div class="big">${hx}₁₆</div>`,ph:'numero decimale',
+      check:s=>/^\d+$/.test(clean(s))&&parseInt(clean(s),10)===v,correct:String(v),
+      sol:()=>{const t=hx.split('').map((c,i)=>`${parseInt(c,16)}·16${sup(hx.length-1-i)}`);return `Ogni cifra vale una potenza di 16:<pre>${t.join(' + ')}\n= ${v}</pre>`;}};
+  }
+  return {label:'Converti in esadecimale',body:`<div class="big">${v}₁₀</div>`,ph:'es. 3AF',
+    check:s=>{const c=cleanHex(s);return isHex(c)&&parseInt(c,16)===v;},correct:hx,
+    sol:()=>`Divisioni successive per 16:<pre>${divSteps(v,16)}\n\n${v} = ${hx}₁₆</pre>`};
+}
+function genHB(d){
+  const k=widths(d).hexb;let hx='';for(let i=0;i<k;i++)hx+=R(0,15).toString(16).toUpperCase();
+  const bits=hx.split('').map(c=>pad(parseInt(c,16),4)).join('');
+  if(Math.random()<.5){
+    const g=bits.match(/.{4}/g).join(' ');
+    return {label:'Converti direttamente in esadecimale (senza passare dal decimale)',body:`<div class="big">${g}₂</div>`,ph:'cifre esadecimali',
+      check:s=>cleanHex(s)===hx,correct:hx,
+      sol:()=>`Un gruppo di 4 bit = una cifra esadecimale:<pre>${bits.match(/.{4}/g).map((g,i)=>`${g} → ${hx[i]}`).join('\n')}\n\n= ${hx}₁₆</pre>`};
+  }
+  return {label:`Converti direttamente in binario (${k*4} bit)`,body:`<div class="big">${hx}₁₆</div>`,ph:`${k*4} bit`,
+    check:s=>clean(s)===bits,correct:bits,
+    sol:()=>`Ogni cifra esadecimale diventa 4 bit:<pre>${hx.split('').map((c,i)=>`${c} → ${bits.substr(i*4,4)}`).join('\n')}\n\n= ${bits}₂</pre>`};
+}
+function opsBody(n,a,b,sign){return `<div class="ops">A = ${ca2(a,n)}  <span style="opacity:.6">(${a})</span><br>B = ${ca2(b,n)}  <span style="opacity:.6">(${b})</span><br><span style="opacity:.7">${sign} su ${n} bit, complemento a 2</span></div>`;}
+function addSol(n,a,b,extra){
+  const A=ca2(a,n),B=ca2(b,n),o=addColumns(A,B),v=a+b;
+  return `${extra||''}<pre>${o.text}</pre>Verifica in decimale: ${a} + (${b}) = ${v}${o.r?` → ${o.r} = ${dec2(o.r)}`:''}`;
+}
+function rangeOf(n){return {min:-(1<<(n-1)),max:(1<<(n-1))-1};}
+function genSS(d){
+  const n=widths(d).ca,{min,max}=rangeOf(n);let a,b;
+  const pos=Math.random()<.5;
+  for(let i=0;i<200;i++){
+    if(pos){a=R(1,max);b=R(1,max);if(a+b<=max)break;}
+    else{a=R(min,-1);b=R(min,-1);if(a+b>=min)break;}
+  }
+  if(pos&&a+b>max){a=1;b=1;} if(!pos&&a+b<min){a=-1;b=-1;}
+  const e=ca2(a+b,n);
+  return {label:`Somma di due numeri ${pos?'positivi':'negativi'} — risultato su ${n} bit`,body:opsBody(n,a,b,'A + B'),ph:`${n} bit`,
+    check:s=>clean(s)===e,correct:e,sol:()=>addSol(n,a,b)};
+}
+function genSO(d){
+  const n=widths(d).ca,{min,max}=rangeOf(n);
+  let a=R(1,max),b=R(min,-1);if(Math.random()<.5)[a,b]=[b,a];
+  const e=ca2(a+b,n);
+  return {label:`Somma di numeri di segno opposto — risultato su ${n} bit`,body:opsBody(n,a,b,'A + B'),ph:`${n} bit`,
+    check:s=>clean(s)===e,correct:e,
+    sol:()=>addSol(n,a,b,'Il riporto finale si scarta (estensione del segno).')};
+}
+function genOV(d){
+  const n=widths(d).ca,{min,max}=rangeOf(n);let a,b,ov;
+  const pos=Math.random()<.5;
+  if(Math.random()<.65){ // overflow case
+    for(let i=0;i<300;i++){
+      if(pos){a=R(1,max);b=R(1,max);if(a+b>max)break;}
+      else{a=R(min,-1);b=R(min,-1);if(a+b<min)break;}
+    }
+    if(pos&&a+b<=max){a=max;b=1;} if(!pos&&a+b>=min){a=min;b=-1;}
+    ov=true;
+  }else{
+    if(pos){a=R(1,max-1);b=R(1,max-a);}else{a=R(min+1,-1);b=R(min-a,-1);}
+    ov=false;
+  }
+  const e=ca2(a+b,n);
+  return {label:`Somma su ${n} bit: scrivi il risultato oppure OVF se c'è overflow`,body:opsBody(n,a,b,'A + B'),ph:`${n} bit oppure OVF`,
+    check:s=>ov?/^(ovf|overflow)$/i.test(clean(s)):clean(s)===e,
+    correct:ov?'OVF (overflow)':e,
+    sol:()=>{const A=ca2(a,n),B=ca2(b,n),o=addColumns(A,B);
+      return `<pre>${o.text}</pre>Range rappresentabile su ${n} bit: ${min} … ${max}.<br>Il risultato vero è ${a+b}: ${ov?`<b>fuori range</b> → overflow (due numeri ${pos?'positivi':'negativi'} hanno dato un risultato di segno opposto: ${o.r})`:'rientra nel range → nessun overflow.'}`;}};
+}
+function genSB(d){
+  const n=widths(d).ca,{min,max}=rangeOf(n);let a,b;
+  for(let i=0;i<300;i++){a=R(min,max);b=R(min+1,max);if(b!==0&&a-b>=min&&a-b<=max)break;}
+  if(!(a-b>=min&&a-b<=max)){a=3;b=2;}
+  const e=ca2(a-b,n);
+  return {label:`Sottrazione A − B — risultato su ${n} bit`,body:opsBody(n,a,b,'A − B'),ph:`${n} bit`,
+    check:s=>clean(s)===e,correct:e,
+    sol:()=>{const B=ca2(b,n),nb=ca2(-b,n);const o=addColumns(ca2(a,n),nb);
+      return `A − B = A + (−B). Complemento a 2 di B:<pre>B      = ${B}\ninverto = ${inv(B)}\n+1      = ${nb}   (= ${-b})</pre>Ora somma:<pre>${o.text}</pre>Verifica: ${a} − (${b}) = ${a-b}`;}};
+}
+function genCC(d){
+  const n=widths(d).ca,{min}=rangeOf(n);
+  const v=R(min+1,-1),use1=Math.random()<.4;
+  const pos=pad(-v,n),i1=inv(pos),i2=ca2(v,n),e=use1?i1:i2;
+  return {label:`Rappresenta ${v} in complemento a ${use1?'1':'2'} su ${n} bit`,body:`<div class="big">${v}</div>`,ph:`${n} bit`,
+    check:s=>clean(s)===e,correct:e,
+    sol:()=>`<pre>|${v}| in binario (${n} bit) = ${pos}\ninverto i bit (Ca1)      = ${i1}${use1?'':`\n+1 (Ca2)                 = ${i2}`}</pre>`};
+}
+function genFR(d){
+  const fb=[2,3,4][d-1],ib=[3,4,5][d-1];
+  const ip=R(1,(1<<ib)-1),fpart=R(1,(1<<fb)-1),ipb=ip.toString(2),fpb=pad(fpart,fb);
+  const val=ip+fpart/(1<<fb);
+  if(Math.random()<.5){
+    return {label:'Converti in decimale (usa la virgola)',body:`<div class="big">${ipb},${fpb}₂</div>`,ph:'es. 5,375',
+      check:s=>Math.abs(parseFloat(s.trim().replace(',','.'))-val)<1e-9,correct:fmt(val),
+      sol:()=>{const t=fpb.split('').map((c,i)=>c==='1'?`2${sup(-(i+1))}=${fmt(1/Math.pow(2,i+1))}`:null).filter(Boolean);
+        return `Parte intera: ${ipb}₂ = ${ip}<br>Parte frazionaria:<pre>${t.join(' + ')}\n= ${fmt(fpart/(1<<fb))}</pre>Totale: ${fmt(val)}`;}};
+  }
+  return {label:'Converti in binario con virgola (numero finito di cifre)',body:`<div class="big">${fmt(val)}₁₀</div>`,ph:'es. 101,011',
+    check:s=>{const c=clean(s).replace('.',',').split(',');if(!isBin(c[0]||'')||(c[1]!==undefined&&c[1]!==''&&!isBin(c[1])))return false;
+      const iv=parseInt(c[0],2),fv=c[1]?parseInt(c[1],2)/Math.pow(2,c[1].length):0;return Math.abs(iv+fv-val)<1e-9;},
+    correct:`${ipb},${fpb.replace(/0+$/,'')||'0'}`,
+    sol:()=>{let x=fpart/(1<<fb),L=[],out='';for(let i=0;i<fb+1&&x>0;i++){const y=x*2,bit=Math.floor(y);L.push(`${fmt(x)} × 2 = ${fmt(y)}  → cifra ${bit}`);out+=bit;x=y-bit;}
+      return `Parte intera: ${ip} = ${ipb}₂<br>Parte frazionaria (moltiplicazioni per 2, cifre dall'alto):<pre>${L.join('\n')}</pre>Risultato: ${ipb},${out}₂`;}};
+}
+
+function genSN(d){
+  const n=widths(d).ca,{min}=rangeOf(n);let a,b;
+  for(let i=0;i<300;i++){a=R(min+1,-1);b=R(min+1,-1);if(a+b>=min)break;}
+  if(a+b<min){a=-1;b=-1;}
+  const e=ca2(a+b,n);
+  return {label:`Somma di due numeri negativi — risultato su ${n} bit`,body:opsBody(n,a,b,'A + B'),ph:`${n} bit`,
+    check:s=>clean(s)===e,correct:e,
+    sol:()=>addSol(n,a,b,'Entrambi i numeri hanno bit di segno 1: il risultato è negativo e deve iniziare ancora per 1. Il riporto finale si scarta.')};
+}
+function genFP(d){
+  const f=[2,4,5][d-1],er=[[0,4],[-4,8],[-8,10]][d-1];
+  const e=R(er[0],er[1]),k=R(0,(1<<f)-1),neg=Math.random()<.5?1:0;
+  const mant=1+k/(1<<f),val=(neg?-1:1)*mant*Math.pow(2,e);
+  const fr=pad(k,f),m23=fr+'0'.repeat(23-f),eb=pad(e+127,8),bits=String(neg)+eb+m23;
+  const grouped=`${neg} | ${eb} | ${m23}`;
+  const valTxt=fmt(val);
+  if(Math.random()<.5){
+    return {label:'Scrivi il numero in IEEE-754 single precision (32 bit)',body:`<div class="big">${valTxt}</div>`,ph:'32 bit (S | esp | mantissa)',
+      check:s=>{const c=clean(s).replace(/\|/g,'');if(/^[01]{32}$/.test(c))return c===bits;const h=cleanHex(s);if(/^[0-9A-F]{8}$/.test(h))return pad(parseInt(h,16),32)===bits;return false;},
+      correct:grouped,
+      sol:()=>`<pre>1) Segno: ${neg?'negativo':'positivo'} → S = ${neg}\n2) Normalizzazione: |x| = 1,${fr}₂ × 2${sup(e)}   (1,${fr}₂ = ${fmt(mant)})\n3) Esponente memorizzato: ${e} + 127 = ${e+127} = ${eb}₂\n4) Mantissa: cifre dopo la virgola (${fr}) completate a 23 bit con zeri\n\nRisultato: ${grouped}</pre>`};
+  }
+  const dif=Math.abs;
+  return {label:'Converti da IEEE-754 single precision a decimale',body:`<div class="big" style="font-size:1.15rem">${neg}&nbsp;|&nbsp;${eb}&nbsp;|&nbsp;${m23}</div><div style="opacity:.65;font-size:.78rem;margin-top:.4rem">segno | esponente (8 bit) | mantissa (23 bit)</div>`,ph:'numero decimale, es. −13,25',
+    check:s=>{const t=s.trim().replace('−','-').replace(',','.');if(!/^[+-]?\d+(\.\d+)?$/.test(t))return false;return dif(parseFloat(t)-val)<=1e-9*Math.max(1,dif(val));},
+    correct:valTxt,
+    sol:()=>`<pre>S = ${neg} → numero ${neg?'negativo':'positivo'}\nE = ${eb}₂ = ${e+127}  →  esponente reale = ${e+127} − 127 = ${e}\nMantissa: 1,${fr}₂ (bit implicito 1 davanti) = ${fmt(mant)}\n\nValore = ${neg?'−':''}${fmt(mant)} × 2${sup(e)} = ${valTxt}</pre>`};
+}
+
+// ---------- state & UI ----------
+const S={cats:new Set(CATS.map(c=>c.id)),diff:2,len:10,timed:0,q:null,n:0,score:0,streak:0,log:[],hintUsed:false,answered:false,timer:null,left:45,best:0};
+const $=id=>document.getElementById(id);
+try{S.best=parseInt(localStorage.getItem('bitchallenge_best')||'0',10)||0;}catch(e){}
+$('bestTxt').textContent=S.best?`Record personale: ${S.best} punti`:'';
+
+const catsEl=$('cats');
+CATS.forEach(c=>{const b=document.createElement('button');b.className='chip on';b.textContent=c.name;
+  b.onclick=()=>{if(S.cats.has(c.id)){if(S.cats.size>1){S.cats.delete(c.id);b.classList.remove('on');}}else{S.cats.add(c.id);b.classList.add('on');}};
+  catsEl.appendChild(b);});
+function seg(id,key,num){document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('on'));b.classList.add('on');S[key]=+b.dataset.v;});}
+seg('diff','diff');seg('len','len');seg('timed','timed');
+
+function goHome(){clearInterval(S.timer);show('setup');}
+function show(id){$('homeBtn').classList.toggle('hidden',id==='setup');['setup','game','end'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo({top:0});}
+function start(){S.n=0;S.score=0;S.streak=0;S.log=[];show('game');nextQ();}
+function nextQ(){
+  clearInterval(S.timer);
+  if(S.n>=S.len){return finish();}
+  S.n++;
+  const pool=CATS.filter(c=>S.cats.has(c.id));const cat=pick(pool);
+  S.q=cat.gen(S.diff);S.q.cat=cat;S.hintUsed=false;S.answered=false;
+  $('tag').textContent=cat.name;$('qLabel').textContent=S.q.label;$('qBody').innerHTML=S.q.body;
+  $('inp').value='';$('inp').placeholder=S.q.ph;$('inp').disabled=false;$('inp').focus();
+  $('checkBtn').disabled=false;$('hintBtn').disabled=false;
+  ['hint','sol','nextWrap'].forEach(x=>$(x).classList.add('hidden'));
+  $('fb').textContent='';$('fb').className='fb';
+  $('nextBtn').textContent=S.n>=S.len?'Vedi risultato →':'Avanti →';
+  hud();
+  $('hTwrap').classList.toggle('hidden',!S.timed);
+  if(S.timed){S.left=45;$('hT').textContent=S.left;S.timer=setInterval(()=>{S.left--;$('hT').textContent=S.left;if(S.left<=0){clearInterval(S.timer);resolve(false,true);}},1000);}
+}
+function hud(){$('hQ').textContent=`${S.n}/${S.len}`;$('hS').textContent=S.score;$('hK').textContent=S.streak;$('prog').style.width=((S.n-1)/S.len*100)+'%';}
+function resolve(ok,timeout){
+  if(S.answered)return;S.answered=true;clearInterval(S.timer);
+  let gain=0;
+  if(ok){S.streak++;gain=10+Math.min(S.streak,5)*2+(S.timed?Math.round(S.left/5):0)-(S.hintUsed?3:0);gain=Math.max(gain,1);S.score+=gain;}
+  else S.streak=0;
+  S.log.push({cat:S.q.cat.name,ok});
+  $('fb').className='fb '+(ok?'ok':'bad');
+  $('fb').textContent=ok?`✅ Esatto! +${gain} punti`:(timeout?'⏱️ Tempo scaduto. ':'❌ Non esatto. ')+'Risposta corretta: '+S.q.correct;
+  $('sol').innerHTML='<b>Svolgimento</b><br>'+S.q.sol();$('sol').classList.remove('hidden');
+  $('nextWrap').classList.remove('hidden');$('inp').disabled=true;$('checkBtn').disabled=true;$('hintBtn').disabled=true;
+  hud();$('nextBtn').focus();
+}
+$('checkBtn').onclick=()=>{const v=$('inp').value;if(!v.trim()){$('inp').focus();return;}let ok=false;try{ok=!!S.q.check(v);}catch(e){}resolve(ok,false);};
+$('inp').addEventListener('keydown',e=>{if(e.key==='Enter')$('checkBtn').click();});
+$('nextBtn').onclick=nextQ;
+$('hintBtn').onclick=()=>{S.hintUsed=true;const h=$('hint');h.textContent='💡 '+TIPS[S.q.cat.id];h.classList.remove('hidden');};
+function finish(){
+  show('end');$('eScore').textContent=S.score;
+  const ok=S.log.filter(x=>x.ok).length,pct=Math.round(ok/S.log.length*100);
+  let msg=`${ok} risposte esatte su ${S.log.length} (${pct}%). `;
+  msg+=pct>=90?'Livello: Maestro del binario 🏆':pct>=70?'Livello: Esperto 🥈':pct>=50?'Livello: Apprendista 🥉':'Livello: Principiante — riprova, ripassa i suggerimenti!';
+  if(S.score>S.best){S.best=S.score;try{localStorage.setItem('bitchallenge_best',String(S.best));}catch(e){}msg+=' · Nuovo record!';}
+  $('eMsg').textContent=msg;
+  const by={};S.log.forEach(x=>{by[x.cat]=by[x.cat]||{t:0,o:0};by[x.cat].t++;if(x.ok)by[x.cat].o++;});
+  $('eTable').innerHTML='<tr><th>Tipo di esercizio</th><th>Esatte</th></tr>'+Object.keys(by).map(k=>`<tr><td>${k}</td><td>${by[k].o}/${by[k].t}</td></tr>`).join('');
+  $('bestTxt').textContent=`Record personale: ${S.best} punti`;
+}
+$('startBtn').onclick=start;$('againBtn').onclick=start;$('menuBtn').onclick=goHome;$('homeBtn').onclick=goHome;
+</script>
+</body>
+</html>
