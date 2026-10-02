@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Gamification — Esercizi random di codifica binaria ed esadecimale</title>
+<title>Bit Challenge — Esercizi random di codifica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -80,8 +80,9 @@ th{color:var(--gray);font-size:.75rem}
 
 <section id="setup" class="card">
   <h2>Prepara la sfida</h2>
-  <div class="lbl">TIPI DI ESERCIZIO (scegline uno o più)</div>
+  <div class="lbl" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem"><span>TIPI DI ESERCIZIO — clicca per scegliere uno o più (nessuno selezionato = tutti)</span><span style="display:flex;gap:.4rem"><button type="button" class="ghost" id="selAll" style="padding:.3rem .6rem;font-size:.72rem">Tutti</button><button type="button" class="ghost" id="selNone" style="padding:.3rem .6rem;font-size:.72rem">Nessuno</button></span></div>
   <div class="chips" id="cats"></div>
+  <p class="small" id="catWarn" style="margin:.5rem 0 0"></p>
   <div class="row">
     <div><div class="lbl">DIFFICOLTÀ</div>
       <div class="seg" id="diff"><button data-v="1">Facile</button><button data-v="2" class="on">Medio</button><button data-v="3">Difficile</button></div></div>
@@ -177,6 +178,7 @@ const TIPS={
  ov:'C\'è overflow se sommi due numeri dello stesso segno e il risultato ha segno opposto (fuori dal range −2ⁿ⁻¹ … 2ⁿ⁻¹−1).',
  sb:'A − B = A + (−B): calcola il complemento a 2 di B (inverti e +1) poi somma.',
  cc:'Per un negativo: scrivi il modulo in binario, inverti tutti i bit (Ca1) e, per il Ca2, aggiungi 1.',
+ op:'Per cambiare segno in Ca2: inverti tutti i bit e aggiungi 1 (stessa regola sia da positivo a negativo sia viceversa). Il valore minimo rappresentabile (−2ⁿ⁻¹) è un caso speciale: il suo opposto non entra negli stessi bit → OVF.',
  sn:'Due negativi: bit di segno 1 in entrambi. Somma in colonna, scarta il riporto finale; il risultato deve iniziare ancora con 1, altrimenti c\'è overflow.',
  fp:'IEEE-754 (32 bit) = 1 bit segno + 8 bit esponente (bias 127) + 23 bit mantissa. Valore = ±1,mantissa × 2^(E−127). Per il verso inverso: normalizza, esponente memorizzato = e+127, mantissa = cifre dopo la virgola completate a 23 con zeri.',
  fr:'Parte intera con le potenze di 2; dopo la virgola pesano 2⁻¹, 2⁻², 2⁻³… Dec→bin: moltiplica la parte frazionaria per 2 e leggi le cifre dall\'alto.'
@@ -191,6 +193,7 @@ const CATS=[
  {id:'ov',name:'Somma con overflow',gen:genOV},
  {id:'sb',name:'Sottrazione in Ca2',gen:genSB},
  {id:'cc',name:'Rappresentazione Ca1/Ca2',gen:genCC},
+ {id:'op',name:'Trova l\'opposto di un numero',gen:genOP},
  {id:'fr',name:'Virgola binaria ⇄ decimale',gen:genFR},
  {id:'fp',name:'Virgola mobile IEEE-754 ⇄ decimale',gen:genFP}
 ];
@@ -298,6 +301,30 @@ function genCC(d){
     check:s=>clean(s)===e,correct:e,
     sol:()=>`<pre>|${v}| in binario (${n} bit) = ${pos}\ninverto i bit (Ca1)      = ${i1}${use1?'':`\n+1 (Ca2)                 = ${i2}`}</pre>`};
 }
+function genOP(d){
+  const n=widths(d).ca,{min,max}=rangeOf(n);
+  const edge=Math.random()<0.15;
+  const v=edge?min:R(min+1,max);
+  const opp=-v,impossible=edge; // −min non rientra in n bit
+  const askBin=Math.random()<0.5;
+  if(askBin){
+    const ans=impossible?'OVF':ca2(opp,n);
+    return {label:`Trova l'opposto di ${v} e scrivilo in complemento a 2 su ${n} bit`,body:`<div class="big">${v}</div>`,
+      ph:impossible?`${n} bit oppure OVF`:`${n} bit`,
+      check:s=>impossible?/^(ovf|overflow)$/i.test(clean(s)):clean(s)===ans,
+      correct:impossible?'OVF (non rappresentabile)':ans,
+      sol:()=>{const vb=ca2(v,n);
+        if(impossible) return `<pre>${v} è il valore più negativo rappresentabile su ${n} bit (−2${sup(n-1)}).\nIl suo opposto sarebbe +2${sup(n-1)} = ${-v}, ma il massimo positivo rappresentabile è ${max}.\n→ l'opposto NON entra in ${n} bit: OVF.</pre>`;
+        return `<pre>${v} in Ca2 (${n} bit)  = ${vb}\nInverto tutti i bit      = ${inv(vb)}\n+ 1                      = ${ca2(opp,n)}\n\nL'opposto di ${v} è ${opp} = ${ca2(opp,n)}₂</pre>`;}};
+  }
+  const vb=ca2(v,n);
+  return {label:`Il numero è in Ca2 su ${n} bit. Qual è il valore decimale del suo opposto?`,body:`<div class="big">${vb}₂</div>`,
+    ph:impossible?'numero oppure OVF':'numero decimale',
+    check:s=>impossible?/^(ovf|overflow)$/i.test(clean(s)):(/^-?\d+$/.test(clean(s))&&parseInt(clean(s),10)===opp),
+    correct:impossible?'OVF (non rappresentabile su questi bit)':String(opp),
+    sol:()=>{if(impossible) return `<pre>${vb}₂ = ${v} (il valore più negativo su ${n} bit)\nIl suo opposto (+${-v}) supera il massimo rappresentabile (${max}) → OVF.</pre>`;
+      return `<pre>${vb}₂ = ${v}\nOpposto: cambia segno → ${opp}\n\nVerifica in binario (inverti i bit e +1): ${ca2(opp,n)}₂</pre>`;}};
+}
 function genFR(d){
   const fb=[2,3,4][d-1],ib=[3,4,5][d-1];
   const ip=R(1,(1<<ib)-1),fpart=R(1,(1<<fb)-1),ipb=ip.toString(2),fpb=pad(fpart,fb);
@@ -346,29 +373,34 @@ function genFP(d){
 }
 
 // ---------- state & UI ----------
-const S={cats:new Set(CATS.map(c=>c.id)),diff:2,len:10,timed:0,q:null,n:0,score:0,streak:0,log:[],hintUsed:false,answered:false,timer:null,left:45,best:0};
+const S={cats:new Set(),diff:2,len:10,timed:0,q:null,n:0,score:0,streak:0,log:[],hintUsed:false,answered:false,timer:null,left:45,best:0};
 const $=id=>document.getElementById(id);
 try{S.best=parseInt(localStorage.getItem('bitchallenge_best')||'0',10)||0;}catch(e){}
 $('bestTxt').textContent=S.best?`Record personale: ${S.best} punti`:'';
 
 const catsEl=$('cats');
-CATS.forEach(c=>{const b=document.createElement('button');b.className='chip on';b.textContent=c.name;
-  b.onclick=()=>{if(S.cats.has(c.id)){if(S.cats.size>1){S.cats.delete(c.id);b.classList.remove('on');}}else{S.cats.add(c.id);b.classList.add('on');}};
+CATS.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c.name;
+  b.onclick=()=>{if(S.cats.has(c.id)){S.cats.delete(c.id);b.classList.remove('on');}else{S.cats.add(c.id);b.classList.add('on');}};
   catsEl.appendChild(b);});
+document.getElementById('selAll').onclick=()=>{S.cats=new Set(CATS.map(c=>c.id));catsEl.querySelectorAll('.chip').forEach(b=>b.classList.add('on'));};
+document.getElementById('selNone').onclick=()=>{S.cats.clear();catsEl.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));};
 function seg(id,key,num){document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('on'));b.classList.add('on');S[key]=+b.dataset.v;});}
 seg('diff','diff');seg('len','len');seg('timed','timed');
 
 function goHome(){clearInterval(S.timer);show('setup');}
 function show(id){$('homeBtn').classList.toggle('hidden',id==='setup');['setup','game','end'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo({top:0});}
-function start(){S.n=0;S.score=0;S.streak=0;S.log=[];show('game');nextQ();}
+function start(){
+  S.activeCats = S.cats.size ? S.cats : new Set(CATS.map(c=>c.id));
+  S.n=0;S.score=0;S.streak=0;S.log=[];show('game');nextQ();
+}
 function nextQ(){
   clearInterval(S.timer);
   if(S.n>=S.len){return finish();}
   S.n++;
-  const pool=CATS.filter(c=>S.cats.has(c.id));const cat=pick(pool);
+  const pool=CATS.filter(c=>S.activeCats.has(c.id));const cat=pick(pool);
   S.q=cat.gen(S.diff);S.q.cat=cat;S.hintUsed=false;S.answered=false;
-  $('tag').textContent=cat.name;$('qLabel').textContent=S.q.label;$('qBody').innerHTML=S.q.body;
+  $('tag').textContent=cat.name+(S.activeCats.size<CATS.length?` (${S.activeCats.size} tip${S.activeCats.size>1?'i':'o'} attiv${S.activeCats.size>1?'i':'o'})`:'');$('qLabel').textContent=S.q.label;$('qBody').innerHTML=S.q.body;
   $('inp').value='';$('inp').placeholder=S.q.ph;$('inp').disabled=false;$('inp').focus();
   $('checkBtn').disabled=false;$('hintBtn').disabled=false;
   ['hint','sol','nextWrap'].forEach(x=>$(x).classList.add('hidden'));
